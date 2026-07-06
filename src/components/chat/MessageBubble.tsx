@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
@@ -62,6 +63,11 @@ export function SourceChips({ sources }: { sources: Source[] }) {
 
 export default function MessageBubble({ message, isStreaming }: Props) {
   const isUser = message.role === 'user'
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+
+  // Plain text until client mounts (avoids SSR/hydration mismatch with ESM math plugins)
+  const renderPlain = isUser || isStreaming || !mounted
 
   return (
     <div className={`flex flex-col gap-2 ${isUser ? 'items-end' : 'items-start'}`}>
@@ -72,10 +78,10 @@ export default function MessageBubble({ message, isStreaming }: Props) {
         className={`max-w-prose rounded-2xl px-4 py-2.5 text-sm leading-relaxed break-words ${
           isUser
             ? 'bg-primary text-white rounded-br-sm whitespace-pre-wrap'
-            : `bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-bl-sm${isStreaming ? ' whitespace-pre-wrap' : ''}`
+            : `bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-bl-sm${renderPlain ? ' whitespace-pre-wrap' : ''}`
         }`}
       >
-        {isUser || isStreaming ? (
+        {renderPlain ? (
           <>
             {message.content || (isStreaming ? '' : <span className="text-zinc-400 italic">…</span>)}
             {isStreaming && (
@@ -84,7 +90,7 @@ export default function MessageBubble({ message, isStreaming }: Props) {
           </>
         ) : (
           <ReactMarkdown
-            remarkPlugins={[remarkMath]}
+            remarkPlugins={[[remarkMath, { singleDollarTextMath: true }]]}
             rehypePlugins={[[rehypeKatex, { throwOnError: false, output: 'html' }]]}
             components={mdComponents}
           >
