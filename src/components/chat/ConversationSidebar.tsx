@@ -1,25 +1,13 @@
-import type { Conversation, UploadedDocument } from '@/lib/chat/types'
-import DocumentPanel from './DocumentPanel'
+import type { Conversation } from '@/lib/chat/types'
 
 interface Props {
   conversations: Conversation[]
   activeId: number | null
-  documents: UploadedDocument[]
   onSelect: (id: number) => void
   onNew: () => void
-  onArxivIngest: (arxivId: string) => Promise<{ already_ingested: boolean }>
-  onDeleteDoc: (id: number) => Promise<void>
 }
 
-export default function ConversationSidebar({
-  conversations,
-  activeId,
-  documents,
-  onSelect,
-  onNew,
-  onArxivIngest,
-  onDeleteDoc,
-}: Props) {
+export default function ConversationSidebar({ conversations, activeId, onSelect, onNew }: Props) {
   return (
     <aside className="w-72 flex-shrink-0 flex flex-col border-r border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 overflow-hidden">
       <div className="p-3 border-b border-zinc-200 dark:border-zinc-800 flex-shrink-0">
@@ -50,8 +38,6 @@ export default function ConversationSidebar({
           ))
         )}
       </div>
-
-      <DocumentPanel documents={documents} onArxivIngest={onArxivIngest} onDelete={onDeleteDoc} />
     </aside>
   )
 }

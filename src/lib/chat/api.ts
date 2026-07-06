@@ -26,8 +26,9 @@ export async function loadConversation(id: number): Promise<ConversationDetail> 
 }
 
 export async function listDocuments(): Promise<UploadedDocument[]> {
-  const res = await fetch(`${BASE}/documents/`, { credentials: 'include' })
-  if (!res.ok) throw new Error('Failed to load documents')
+  const res = await fetch(`${BASE}/documents`, { credentials: 'include' })
+  if (res.status === 404) return []
+  if (!res.ok) throw new Error(`Failed to load documents (${res.status})`)
   return res.json()
 }
 

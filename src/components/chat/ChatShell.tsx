@@ -1,16 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { Conversation, Message, Model, Source, UploadedDocument } from '@/lib/chat/types'
+import type { Conversation, Message, Model, Source } from '@/lib/chat/types'
 import {
   createConversation,
   fetchMe,
   fetchModels,
   listConversations,
   loadConversation,
-  listDocuments,
-  ingestArxiv,
-  deleteDocument,
   streamChatMessage,
   updatePreferredModel,
 } from '@/lib/chat/api'
@@ -23,14 +20,12 @@ export default function ChatShell() {
   const [messages, setMessages] = useState<Message[]>([])
   const [pendingMsg, setPendingMsg] = useState<PendingMessage | null>(null)
   const [isStreaming, setIsStreaming] = useState(false)
-  const [documents, setDocuments] = useState<UploadedDocument[]>([])
   const [error, setError] = useState<string | null>(null)
   const [models, setModels] = useState<Model[]>([])
   const [selectedModel, setSelectedModel] = useState<string | null>(null)
 
   useEffect(() => {
     listConversations().then(setConversations).catch(() => {})
-    listDocuments().then(setDocuments).catch(() => {})
     fetchModels().then(setModels).catch(() => {})
     fetchMe().then((me) => setSelectedModel(me.preferred_model)).catch(() => {})
   }, [])
@@ -120,33 +115,13 @@ export default function ChatShell() {
     }
   }
 
-  async function handleArxivIngest(arxivId: string): Promise<{ already_ingested: boolean }> {
-    const doc = await ingestArxiv(arxivId)
-    if (!doc.already_ingested) {
-      setDocuments((prev) => [doc, ...prev])
-    }
-    return { already_ingested: doc.already_ingested }
-  }
-
-  async function handleDeleteDoc(id: number) {
-    try {
-      await deleteDocument(id)
-      setDocuments((prev) => prev.filter((d) => d.id !== id))
-    } catch {
-      setError('Could not delete document.')
-    }
-  }
-
   return (
     <div className="flex h-[calc(100dvh-56px)]">
       <ConversationSidebar
         conversations={conversations}
         activeId={activeId}
-        documents={documents}
         onSelect={selectConversation}
         onNew={handleNewConversation}
-        onArxivIngest={handleArxivIngest}
-        onDeleteDoc={handleDeleteDoc}
       />
       <ChatArea
         messages={messages}
