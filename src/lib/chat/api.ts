@@ -51,6 +51,25 @@ export async function deleteDocument(id: number): Promise<void> {
   if (!res.ok) throw new Error('Delete failed')
 }
 
+export async function deleteConversation(id: number): Promise<void> {
+  const res = await fetch(`${BASE}/chat/conversations/${id}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  })
+  if (!res.ok) throw new Error('Failed to delete conversation')
+}
+
+export async function renameConversation(id: number, title: string): Promise<Conversation> {
+  const res = await fetch(`${BASE}/chat/conversations/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title }),
+    credentials: 'include',
+  })
+  if (!res.ok) throw new Error('Failed to rename conversation')
+  return res.json()
+}
+
 export async function fetchModels(): Promise<Model[]> {
   const res = await fetch(`${BASE}/chat/models`)
   if (!res.ok) throw new Error('Failed to load models')

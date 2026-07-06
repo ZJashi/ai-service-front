@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react'
 import type { Conversation, Message, Model, Source } from '@/lib/chat/types'
 import {
   createConversation,
+  deleteConversation,
   fetchMe,
   fetchModels,
   listConversations,
   loadConversation,
+  renameConversation,
   streamChatMessage,
   updatePreferredModel,
 } from '@/lib/chat/api'
@@ -47,6 +49,22 @@ export default function ChatShell() {
     } catch {
       setError('Failed to load conversation.')
     }
+  }
+
+  async function handleDelete(id: number) {
+    await deleteConversation(id)
+    setConversations((prev) => prev.filter((c) => c.id !== id))
+    if (activeId === id) {
+      setActiveId(null)
+      setMessages([])
+      setPendingMsg(null)
+      setError(null)
+    }
+  }
+
+  async function handleRename(id: number, title: string) {
+    const updated = await renameConversation(id, title)
+    setConversations((prev) => prev.map((c) => (c.id === id ? updated : c)))
   }
 
   async function handleNewConversation() {
@@ -122,6 +140,8 @@ export default function ChatShell() {
         activeId={activeId}
         onSelect={selectConversation}
         onNew={handleNewConversation}
+        onDelete={handleDelete}
+        onRename={handleRename}
       />
       <ChatArea
         messages={messages}
