@@ -9,6 +9,7 @@ export interface Source {
   index: number
   document_id: number
   title: string
+  arxiv_id: string | null
   chunk_index: number
 }
 
