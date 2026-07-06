@@ -25,6 +25,7 @@ export default function ChatShell() {
   const [error, setError] = useState<string | null>(null)
   const [models, setModels] = useState<Model[]>([])
   const [selectedModel, setSelectedModel] = useState<string | null>(null)
+  const [webSearch, setWebSearch] = useState(false)
 
   useEffect(() => {
     listConversations().then(setConversations).catch(() => {})
@@ -104,6 +105,7 @@ export default function ChatShell() {
         activeId,
         content,
         selectedModel,
+        webSearch,
         (sources) => {
           finalSources = sources
           setPendingMsg((prev) => (prev ? { ...prev, sources } : { content: '', sources }))
@@ -153,6 +155,8 @@ export default function ChatShell() {
         models={models}
         selectedModel={selectedModel}
         onModelChange={handleModelChange}
+        webSearch={webSearch}
+        onWebSearchToggle={() => setWebSearch((v) => !v)}
       />
     </div>
   )

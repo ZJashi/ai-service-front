@@ -100,11 +100,13 @@ export async function streamChatMessage(
   convId: number,
   content: string,
   model: string | null,
+  webSearch: boolean,
   onSources: (sources: Source[]) => void,
   onDelta: (text: string) => void,
 ): Promise<void> {
   const body: Record<string, unknown> = { content }
   if (model) body.model = model
+  if (webSearch) body.web_search = true
 
   const res = await fetch(`${BASE}/chat/conversations/${convId}/messages`, {
     method: 'POST',

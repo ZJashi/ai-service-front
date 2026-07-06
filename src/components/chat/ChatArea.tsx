@@ -21,9 +21,13 @@ interface Props {
   models: Model[]
   selectedModel: string | null
   onModelChange: (id: string | null) => void
+  webSearch: boolean
+  onWebSearchToggle: () => void
 }
 
-export default function ChatArea({ messages, pendingMsg, isStreaming, activeId, error, onSend, models, selectedModel, onModelChange }: Props) {
+export default function ChatArea({ messages, pendingMsg, isStreaming, activeId, error, onSend, models, selectedModel, onModelChange, webSearch, onWebSearchToggle }: Props) {
+  const currentModel = models.find((m) => m.id === selectedModel)
+  const isFreeModel = currentModel?.free ?? false
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [input, setInput] = useState('')
@@ -107,8 +111,25 @@ export default function ChatArea({ messages, pendingMsg, isStreaming, activeId, 
           </div>
         )}
         <div className="p-4">
-          <div className="max-w-2xl mx-auto mb-2">
+          <div className="max-w-2xl mx-auto mb-2 flex items-center gap-3">
             <ModelSelector models={models} value={selectedModel} onChange={onModelChange} />
+            <button
+              type="button"
+              onClick={onWebSearchToggle}
+              title={isFreeModel ? 'Web search requires a paid model' : 'Toggle web search'}
+              className={`group flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium border transition-colors shrink-0 ${
+                webSearch && !isFreeModel
+                  ? 'bg-primary/10 border-primary/30 text-primary dark:bg-primary/20'
+                  : 'border-zinc-200 dark:border-zinc-700 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-600'
+              } ${isFreeModel ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+              Web search
+            </button>
           </div>
           <form
             onSubmit={(e) => { e.preventDefault(); handleSubmit(new FormData(e.currentTarget)) }}
