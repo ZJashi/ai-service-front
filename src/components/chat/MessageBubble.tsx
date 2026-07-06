@@ -42,11 +42,18 @@ interface Props {
   isStreaming?: boolean
 }
 
-function SourceChip({ title, index }: { title: string; index: number }) {
+function SourceChip({ source }: { source: Source }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-2.5 py-0.5 text-xs text-zinc-600 dark:text-zinc-400">
-      <span className="font-semibold text-primary">[{index}]</span>
-      <span className="truncate max-w-[14rem]">{title}</span>
+    <span className="group relative">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 px-2.5 py-1 text-xs text-zinc-600 dark:text-zinc-400 cursor-default transition-colors">
+        <span className="font-semibold text-primary shrink-0">[{source.index}]</span>
+        <span className="truncate max-w-[12rem]">{source.title}</span>
+      </span>
+      {/* Tooltip */}
+      <span className="pointer-events-none absolute bottom-full left-0 mb-1.5 z-20 hidden group-hover:flex flex-col gap-0.5 w-72 rounded-lg bg-zinc-900 dark:bg-zinc-700 text-white px-3 py-2 shadow-lg">
+        <span className="font-medium text-xs leading-snug">{source.title}</span>
+        <span className="text-zinc-400 dark:text-zinc-300 text-[10px]">Chunk {source.chunk_index + 1}</span>
+      </span>
     </span>
   )
 }
@@ -55,7 +62,7 @@ export function SourceChips({ sources }: { sources: Source[] }) {
   return (
     <div className="flex flex-wrap gap-1.5">
       {sources.map((src) => (
-        <SourceChip key={src.index} title={src.title} index={src.index} />
+        <SourceChip key={src.index} source={src} />
       ))}
     </div>
   )
