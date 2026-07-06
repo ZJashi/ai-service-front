@@ -39,7 +39,10 @@ export async function ingestArxiv(arxivId: string): Promise<UploadedDocument & {
     body: JSON.stringify({ arxiv_id: arxivId }),
     credentials: 'include',
   })
-  if (!res.ok) throw new Error('Failed to ingest paper')
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error((data.detail as string) ?? 'Failed to ingest paper')
+  }
   return res.json()
 }
 

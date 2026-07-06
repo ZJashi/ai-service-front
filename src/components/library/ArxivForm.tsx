@@ -12,9 +12,19 @@ export default function ArxivForm({ onIngest }: Props) {
   const [result, setResult] = useState<'added' | 'existing' | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  function validate(id: string): string | null {
+    // new format: 2301.00001 or 2301.00001v2
+    // old format: hep-th/9901001
+    if (/^\d{4}\.\d{4,5}(v\d+)?$/.test(id)) return null
+    if (/^[a-z-]+(\.[A-Z]{2})?\/\d{7}(v\d+)?$/.test(id)) return null
+    return 'Invalid arXiv ID — expected format: 2301.00001'
+  }
+
   async function handleSubmit(data: FormData) {
     const id = (data.get('arxiv_id') as string).trim()
     if (!id) return
+    const validationError = validate(id)
+    if (validationError) { setError(validationError); return }
     setIngesting(true)
     setResult(null)
     setError(null)
@@ -22,8 +32,8 @@ export default function ArxivForm({ onIngest }: Props) {
       const res = await onIngest(id)
       setArxivId('')
       setResult(res.already_ingested ? 'existing' : 'added')
-    } catch {
-      setError('Failed to ingest paper. Check the arXiv ID and try again.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to ingest paper.')
     } finally {
       setIngesting(false)
     }
