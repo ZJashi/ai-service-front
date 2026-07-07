@@ -9,7 +9,10 @@ export async function createConversation(title = 'New Conversation'): Promise<Co
     body: JSON.stringify({ title }),
     credentials: 'include',
   })
-  if (!res.ok) throw new Error('Failed to create conversation')
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error((data.detail as string) ?? `Failed to create conversation (${res.status})`)
+  }
   return res.json()
 }
 

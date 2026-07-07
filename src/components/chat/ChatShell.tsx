@@ -76,8 +76,8 @@ export default function ChatShell() {
       setMessages([])
       setPendingMsg(null)
       setError(null)
-    } catch {
-      setError('Failed to create conversation.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create conversation.')
     }
   }
 
