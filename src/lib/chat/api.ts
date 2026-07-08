@@ -49,6 +49,39 @@ export async function ingestArxiv(arxivId: string): Promise<UploadedDocument & {
   return res.json()
 }
 
+export async function ingestTextDocument(
+  title: string,
+  body: string,
+): Promise<UploadedDocument & { already_ingested: boolean }> {
+  const res = await fetch(`${BASE}/documents/text`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, body }),
+    credentials: 'include',
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error((data.detail as string) ?? 'Failed to add document')
+  }
+  return res.json()
+}
+
+export async function startDiscovery(): Promise<{
+  conversation_id: number
+  opening_message: string
+  documents_analyzed: number
+}> {
+  const res = await fetch(`${BASE}/rag/discovery`, {
+    method: 'POST',
+    credentials: 'include',
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error((data.detail as string) ?? 'Failed to start discovery session')
+  }
+  return res.json()
+}
+
 export async function deleteDocument(id: number): Promise<void> {
   const res = await fetch(`${BASE}/documents/${id}`, {
     method: 'DELETE',

@@ -10,6 +10,7 @@ import {
   listConversations,
   loadConversation,
   renameConversation,
+  startDiscovery,
   streamChatMessage,
   updatePreferredModel,
 } from '@/lib/chat/api'
@@ -66,6 +67,36 @@ export default function ChatShell() {
   async function handleRename(id: number, title: string) {
     const updated = await renameConversation(id, title)
     setConversations((prev) => prev.map((c) => (c.id === id ? updated : c)))
+  }
+
+  async function handleStartDiscovery() {
+    try {
+      const data = await startDiscovery()
+      if (data.documents_analyzed === 0) {
+        setError('No documents in your library yet. Add arXiv papers or collaborator backgrounds first.')
+        return
+      }
+      const conv: Conversation = {
+        id: data.conversation_id,
+        title: 'Project Discovery',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+      setConversations((prev) => [conv, ...prev.filter((c) => c.id !== conv.id)])
+      setActiveId(conv.id)
+      setPendingMsg(null)
+      setError(null)
+      const openingMsg: Message = {
+        id: Date.now(),
+        role: 'assistant',
+        content: data.opening_message,
+        sources: null,
+        created_at: new Date().toISOString(),
+      }
+      setMessages([openingMsg])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start discovery session.')
+    }
   }
 
   async function handleNewConversation() {
@@ -142,6 +173,7 @@ export default function ChatShell() {
         activeId={activeId}
         onSelect={selectConversation}
         onNew={handleNewConversation}
+        onStartDiscovery={handleStartDiscovery}
         onDelete={handleDelete}
         onRename={handleRename}
       />

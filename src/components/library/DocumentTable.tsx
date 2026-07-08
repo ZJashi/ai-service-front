@@ -19,7 +19,7 @@ export default function DocumentTable({ docs, deletingId, onDelete }: Props) {
   if (docs.length === 0) {
     return (
       <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 px-4 py-12 text-center text-sm text-zinc-400 dark:text-zinc-500">
-        No papers yet. Add one with the arXiv form above.
+        No documents yet. Add an arXiv paper or a collaborator background above.
       </div>
     )
   }

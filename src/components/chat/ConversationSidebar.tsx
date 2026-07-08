@@ -8,6 +8,7 @@ interface Props {
   activeId: number | null
   onSelect: (id: number) => void
   onNew: () => void
+  onStartDiscovery: () => void
   onDelete: (id: number) => Promise<void>
   onRename: (id: number, title: string) => Promise<void>
 }
@@ -128,15 +129,21 @@ function ConversationItem({
   )
 }
 
-export default function ConversationSidebar({ conversations, activeId, onSelect, onNew, onDelete, onRename }: Props) {
+export default function ConversationSidebar({ conversations, activeId, onSelect, onNew, onStartDiscovery, onDelete, onRename }: Props) {
   return (
     <aside className="w-72 flex-shrink-0 flex flex-col border-r border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 overflow-hidden">
-      <div className="p-3 border-b border-zinc-200 dark:border-zinc-800 flex-shrink-0">
+      <div className="p-3 border-b border-zinc-200 dark:border-zinc-800 flex-shrink-0 flex flex-col gap-2">
         <button
           onClick={onNew}
           className="w-full h-9 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors"
         >
           + New conversation
+        </button>
+        <button
+          onClick={onStartDiscovery}
+          className="w-full h-9 rounded-lg border border-primary text-primary text-sm font-medium hover:bg-primary/10 transition-colors"
+        >
+          Start discovery session
         </button>
       </div>
 
