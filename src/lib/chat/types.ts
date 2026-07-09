@@ -28,9 +28,10 @@ export interface ConversationDetail extends Conversation {
 export interface UploadedDocument {
   id: number
   title: string
+  arxiv_id: string | null
   source: string
   status: string
-  chunk_count: number
+  chunk_count?: number
   created_at: string
 }
 

@@ -15,6 +15,22 @@ interface Props {
   onDelete: (id: number) => void
 }
 
+function SourceCell({ doc }: { doc: UploadedDocument }) {
+  if (doc.arxiv_id) {
+    return (
+      <a
+        href={`https://arxiv.org/abs/${doc.arxiv_id}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-primary hover:underline"
+      >
+        arXiv:{doc.arxiv_id}
+      </a>
+    )
+  }
+  return <span className="text-zinc-500 dark:text-zinc-400 capitalize">{doc.source}</span>
+}
+
 export default function DocumentTable({ docs, deletingId, onDelete }: Props) {
   if (docs.length === 0) {
     return (
@@ -24,6 +40,8 @@ export default function DocumentTable({ docs, deletingId, onDelete }: Props) {
     )
   }
 
+  const showChunks = docs.some((d) => d.chunk_count != null)
+
   return (
     <div>
       <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
@@ -32,7 +50,9 @@ export default function DocumentTable({ docs, deletingId, onDelete }: Props) {
             <tr className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
               <th className="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Title</th>
               <th className="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Source</th>
-              <th className="px-4 py-3 text-right font-medium text-zinc-500 dark:text-zinc-400">Chunks</th>
+              {showChunks && (
+                <th className="px-4 py-3 text-right font-medium text-zinc-500 dark:text-zinc-400">Chunks</th>
+              )}
               <th className="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Status</th>
               <th className="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Ingested</th>
               <th className="px-4 py-3" />
@@ -47,10 +67,14 @@ export default function DocumentTable({ docs, deletingId, onDelete }: Props) {
                 <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100 max-w-sm">
                   <span className="line-clamp-2">{doc.title}</span>
                 </td>
-                <td className="px-4 py-3 text-zinc-500 dark:text-zinc-400 capitalize">{doc.source}</td>
-                <td className="px-4 py-3 text-right tabular-nums text-zinc-700 dark:text-zinc-300">
-                  {doc.chunk_count}
+                <td className="px-4 py-3">
+                  <SourceCell doc={doc} />
                 </td>
+                {showChunks && (
+                  <td className="px-4 py-3 text-right tabular-nums text-zinc-700 dark:text-zinc-300">
+                    {doc.chunk_count ?? '—'}
+                  </td>
+                )}
                 <td className="px-4 py-3">
                   <StatusBadge status={doc.status} />
                 </td>
@@ -78,7 +102,7 @@ export default function DocumentTable({ docs, deletingId, onDelete }: Props) {
       </div>
 
       <p className="mt-3 text-xs text-zinc-400 dark:text-zinc-500">
-        {docs.length} {docs.length === 1 ? 'paper' : 'papers'}
+        {docs.length} {docs.length === 1 ? 'document' : 'documents'}
       </p>
     </div>
   )
